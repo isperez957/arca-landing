@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arca AI — Intelligence for Private Capital</title>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --card: #1a1a28;
+    --border: #252540;
+    --text: #e4e4ec;
+    --muted: #8888a0;
+    --accent: #6c5ce7;
+    --accent2: #00d2ff;
+    --green: #00e676;
+    --red: #ff5252;
+    --radius: 12px;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  .bg-glow {
+    position: fixed; inset:0; z-index:0; pointer-events:none;
+    background: radial-gradient(ellipse at 20% 0%, rgba(108,92,231,0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 100%, rgba(0,210,255,0.08) 0%, transparent 50%);
+  }
+
+  nav {
+    position: fixed; top:0; width:100%; z-index:100;
+    background: rgba(10,10,15,0.85); backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+  nav .inner { max-width:1200px; margin:0 auto; padding:1rem 2rem; display:flex; justify-content:space-between; align-items:center; gap:1rem; }
+  .logo { font-size:1.5rem; font-weight:800; letter-spacing:-0.5px; background:linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; white-space:nowrap; }
+  .nav-right { display:flex; align-items:center; gap:1.5rem; }
+  .nav-links { display:flex; gap:2rem; list-style:none; }
+  .nav-links a { color:var(--muted); text-decoration:none; font-size:0.9rem; transition:color 0.2s; }
+  .nav-links a:hover { color:var(--text); }
+
+  .lang-switch { display:flex; border:1px solid var(--border); border-radius:6px; overflow:hidden; }
+  .lang-switch button { padding:0.3rem 0.6rem; border:none; background:transparent; color:var(--muted); cursor:pointer; font-size:0.8rem; font-family:inherit; transition:all 0.2s; }
+  .lang-switch button.active { background:var(--accent); color:#fff; }
+
+  .btn { padding:0.6rem 1.4rem; border-radius:8px; font-weight:600; font-size:0.85rem; cursor:pointer; border:none; transition:all 0.2s; text-decoration:none; display:inline-block; white-space:nowrap; }
+  .btn-primary { background:var(--accent); color:#fff; }
+  .btn-primary:hover { background:#7c6ff7; transform:translateY(-1px); box-shadow:0 8px 24px rgba(108,92,231,0.3); }
+  .btn-outline { border:1px solid var(--border); background:transparent; color:var(--text); }
+  .btn-outline:hover { border-color:var(--accent); }
+
+  section, footer { position:relative; z-index:1; }
+
+  .hero { padding:10rem 2rem 6rem; text-align:center; max-width:900px; margin:0 auto; }
+  .hero h1 { font-size:3.5rem; font-weight:800; line-height:1.15; letter-spacing:-1px; margin-bottom:1.5rem; }
+  .hero h1 span { background:linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+  .hero p { font-size:1.2rem; color:var(--muted); max-width:650px; margin:0 auto 2.5rem; }
+  .hero .btns { display:flex; gap:1rem; justify-content:center; }
+
+  .problem { padding:5rem 2rem; max-width:1000px; margin:0 auto; }
+  .problem h2, .features h2, .steps h2, .testimonials h2, .pricing h2 { font-size:2.2rem; text-align:center; margin-bottom:3rem; letter-spacing:-0.5px; }
+  .split { display:grid; grid-template-columns:1fr 1fr; gap:2rem; }
+  .split .box { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:2rem; }
+  .split .box.bad { border-left:3px solid var(--red); }
+  .split .box.good { border-left:3px solid var(--green); }
+  .split h3 { font-size:1rem; margin-bottom:1rem; letter-spacing:0.5px; text-transform:uppercase; }
+  .split ul { list-style:none; color:var(--muted); font-size:0.95rem; }
+  .split li { margin-bottom:0.5rem; padding-left:1.2rem; position:relative; }
+  .split li::before { content:'•'; position:absolute; left:0; }
+  .box.bad li::before { color:var(--red); }
+  .box.good li::before { color:var(--green); }
+
+  .features { padding:5rem 2rem; max-width:1200px; margin:0 auto; }
+  .feature-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; }
+  .feature-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:2rem; transition:all 0.3s; }
+  .feature-card:hover { transform:translateY(-6px); border-color:var(--accent); box-shadow:0 16px 48px rgba(108,92,231,0.12); }
+  .feature-icon { font-size:2rem; margin-bottom:1rem; display:block; }
+  .feature-card h3 { margin-bottom:0.75rem; font-size:1.1rem; }
+  .feature-card p { color:var(--muted); font-size:0.9rem; }
+
+  .steps { padding:5rem 2rem; max-width:1000px; margin:0 auto; }
+  .step-timeline { display:grid; grid-template-columns:repeat(4,1fr); gap:1.5rem; }
+  .step { text-align:center; padding:1.5rem; }
+  .step-num { width:48px; height:48px; border-radius:50%; background:var(--accent); color:#fff; font-size:1.2rem; font-weight:800; display:flex; align-items:center; justify-content:center; margin:0 auto 1rem; }
+  .step h4 { font-size:0.95rem; margin-bottom:0.5rem; }
+  .step p { color:var(--muted); font-size:0.85rem; }
+
+  .stats { padding:4rem 2rem; border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+  .stat-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:2rem; max-width:1000px; margin:0 auto; text-align:center; }
+  .stat-num { font-size:2.5rem; font-weight:800; background:linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+  .stat-label { color:var(--muted); font-size:0.85rem; margin-top:0.25rem; }
+
+  .testimonials { padding:5rem 2rem; max-width:1000px; margin:0 auto; }
+  .testimonial-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:1.5rem; }
+  .testimonial-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:2rem; }
+  .testimonial-card p { color:var(--text); font-style:italic; margin-bottom:1.5rem; font-size:0.95rem; line-height:1.7; }
+  .testimonial-card .author { display:flex; align-items:center; gap:0.75rem; }
+  .testimonial-card .author .avatar { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.8rem; }
+  .testimonial-card .author strong { display:block; font-size:0.85rem; }
+  .testimonial-card .author span { color:var(--muted); font-size:0.75rem; }
+
+  .pricing { padding:5rem 2rem; max-width:1000px; margin:0 auto; }
+  .pricing-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; }
+  .pricing-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:2rem; text-align:center; transition:all 0.3s; }
+  .pricing-card.featured { border-color:var(--accent); background:linear-gradient(180deg, rgba(108,92,231,0.08) 0%, var(--card) 40%); }
+  .pricing-card h3 { font-size:1.1rem; margin-bottom:0.5rem; }
+  .pricing-card .price { font-size:2.5rem; font-weight:800; margin:1rem 0; }
+  .pricing-card .price small { font-size:0.9rem; color:var(--muted); font-weight:400; }
+  .pricing-card ul { list-style:none; color:var(--muted); font-size:0.9rem; margin:1.5rem 0; text-align:left; }
+  .pricing-card li { margin-bottom:0.5rem; padding-left:1.5rem; position:relative; }
+  .pricing-card li::before { content:'✓'; position:absolute; left:0; color:var(--green); }
+
+  .contact { padding:5rem 2rem; max-width:600px; margin:0 auto; text-align:center; }
+  .contact h2 { font-size:2rem; margin-bottom:1rem; }
+  .contact p { color:var(--muted); margin-bottom:2rem; }
+  .contact-form { display:flex; flex-direction:column; gap:1rem; text-align:left; }
+  .contact-form input, .contact-form textarea { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:0.8rem 1rem; color:var(--text); font-size:0.95rem; font-family:inherit; resize:vertical; }
+  .contact-form input:focus, .contact-form textarea:focus { outline:none; border-color:var(--accent); }
+
+  footer { border-top:1px solid var(--border); padding:3rem 2rem; text-align:center; color:var(--muted); font-size:0.85rem; }
+  footer a { color:var(--accent); text-decoration:none; }
+
+  .reveal { opacity:0; transform:translateY(40px); transition:opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.visible { opacity:1; transform:translateY(0); }
+
+  .hero-visual { margin: 2rem auto 0; max-width: 700px; }
+  .hero-visual svg { width: 100%; height: auto; display: block; }
+
+  @media (max-width:768px) {
+    .hero-visual { max-width: 100%; }
+    .hero h1 { font-size:2.2rem; }
+    .split, .feature-grid, .step-timeline, .stat-grid, .testimonial-grid, .pricing-grid { grid-template-columns:1fr; }
+    .nav-links { display:none; }
+    .lang-switch button { padding:0.25rem 0.5rem; font-size:0.75rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+
+<nav>
+  <div class="inner">
+    <div class="logo">Arca AI</div>
+    <div class="nav-right">
+      <ul class="nav-links">
+        <li><a href="#product" data-en="Product" data-es="Producto" data-fr="Produit">Product</a></li>
+        <li><a href="#features" data-en="Features" data-es="Funcionalidades" data-fr="Fonctionnalités">Features</a></li>
+        <li><a href="#pricing" data-en="Pricing" data-es="Precios" data-fr="Tarifs">Pricing</a></li>
+        <li><a href="#contact" data-en="Contact" data-es="Contacto" data-fr="Contact">Contact</a></li>
+      </ul>
+      <div class="lang-switch">
+        <button id="btn-en" class="active">🇬🇧 EN</button>
+        <button id="btn-es">🇪🇸 ES</button>
+        <button id="btn-fr">🇫🇷 FR</button>
+      </div>
+      <a href="#contact" class="btn btn-primary" data-en="Request Demo" data-es="Solicitar Demo" data-fr="Demander une Démo">Request Demo</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero reveal">
+  <h1 data-en='AI that understands <span>private capital.</span>' data-es='IA que entiende el <span>capital privado.</span>' data-fr="L'IA qui comprend le <span>capital privé.</span>">AI that understands <span>private capital.</span></h1>
+  <p data-en="Arca AI gives family offices, hedge funds, and private banks an intelligence layer that automates research, compliance, and deal sourcing — so your team focuses on decisions, not busywork."
+     data-es="Arca AI proporciona a family offices, hedge funds y banca privada una capa de inteligencia que automatiza investigación, compliance y deal sourcing — para que tu equipo se centre en decidir, no en tareas mecánicas." data-fr="Arca AI offre aux family offices, hedge funds et banques privées une couche d'intelligence qui automatise la recherche, la conformité et le sourcing de deals — pour que votre équipe se concentre sur les décisions, pas sur les tâches répétitives.">Arca AI gives family offices, hedge funds, and private banks an intelligence layer that automates research, compliance, and deal sourcing — so your team focuses on decisions, not busywork.</p>
+  <div class="hero-visual reveal">
+    <svg viewBox="0 0 700 280" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#6c5ce7;stop-opacity:0.6"/>
+          <stop offset="100%" style="stop-color:#00d2ff;stop-opacity:0.3"/>
+        </linearGradient>
+        <linearGradient id="g2" x1="100%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color:#00e676;stop-opacity:0.5"/>
+          <stop offset="100%" style="stop-color:#6c5ce7;stop-opacity:0.2"/>
+        </linearGradient>
+        <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <!-- Background grid -->
+      <g opacity="0.08" stroke="#6c5ce7" stroke-width="0.5">
+        <line x1="0" y1="70" x2="700" y2="70"/><line x1="0" y1="140" x2="700" y2="140"/><line x1="0" y1="210" x2="700" y2="210"/>
+        <line x1="175" y1="0" x2="175" y2="280"/><line x1="350" y1="0" x2="350" y2="280"/><line x1="525" y1="0" x2="525" y2="280"/>
+      </g>
+      <!-- Candlestick chart bars -->
+      <g opacity="0.15" fill="#6c5ce7">
+        <rect x="50" y="140" width="12" height="60" rx="2"/>
+        <rect x="120" y="110" width="12" height="90" rx="2"/>
+        <rect x="190" y="80" width="12" height="120" rx="2"/>
+        <rect x="260" y="100" width="12" height="100" rx="2"/>
+        <rect x="330" y="60" width="12" height="140" rx="2"/>
+        <rect x="400" y="40" width="12" height="160" rx="2"/>
+        <rect x="470" y="70" width="12" height="130" rx="2"/>
+        <rect x="540" y="50" width="12" height="150" rx="2"/>
+        <rect x="610" y="30" width="12" height="170" rx="2"/>
+      </g>
+      <g opacity="0.12" fill="#00d2ff">
+        <rect x="55" y="160" width="8" height="40" rx="2"/>
+        <rect x="125" y="120" width="8" height="80" rx="2"/>
+        <rect x="195" y="90" width="8" height="110" rx="2"/>
+        <rect x="265" y="110" width="8" height="90" rx="2"/>
+        <rect x="335" y="70" width="8" height="130" rx="2"/>
+        <rect x="405" y="50" width="8" height="150" rx="2"/>
+      </g>
+      <!-- Trend line -->
+      <polyline points="56,200 126,165 196,135 266,155 336,110 406,80 476,120 546,95 616,50" fill="none" stroke="#00e676" stroke-width="1.5" opacity="0.4"/>
+      <!-- Central AI node cluster -->
+      <g filter="url(#glow)">
+        <!-- Connections -->
+        <g stroke="url(#g1)" stroke-width="1" opacity="0.4">
+          <line x1="350" y1="140" x2="170" y2="70"/>
+          <line x1="350" y1="140" x2="530" y2="70"/>
+          <line x1="350" y1="140" x2="170" y2="210"/>
+          <line x1="350" y1="140" x2="530" y2="210"/>
+          <line x1="350" y1="140" x2="350" y2="40"/>
+          <line x1="350" y1="140" x2="80" y2="140"/>
+          <line x1="350" y1="140" x2="620" y2="140"/>
+        </g>
+        <!-- Peripheral nodes -->
+        <circle cx="170" cy="70" r="6" fill="#6c5ce7" opacity="0.9"/>
+        <circle cx="530" cy="70" r="6" fill="#00d2ff" opacity="0.9"/>
+        <circle cx="170" cy="210" r="5" fill="#6c5ce7" opacity="0.7"/>
+        <circle cx="530" cy="210" r="5" fill="#00d2ff" opacity="0.7"/>
+        <circle cx="350" cy="40" r="4" fill="#00e676" opacity="0.6"/>
+        <circle cx="80" cy="140" r="5" fill="#6c5ce7" opacity="0.8"/>
+        <circle cx="620" cy="140" r="5" fill="#00d2ff" opacity="0.8"/>
+        <!-- Central hub -->
+        <circle cx="350" cy="140" r="14" fill="none" stroke="url(#g1)" stroke-width="2"/>
+        <circle cx="350" cy="140" r="8" fill="url(#g1)" opacity="0.9"/>
+        <circle cx="350" cy="140" r="3" fill="#fff" opacity="0.9"/>
+        <!-- Pulse ring -->
+        <circle cx="350" cy="140" r="20" fill="none" stroke="#6c5ce7" stroke-width="0.8" opacity="0.3">
+          <animate attributeName="r" values="14;28;14" dur="3s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.5;0;0.5" dur="3s" repeatCount="indefinite"/>
+        </circle>
+      </g>
+      <!-- Data flow particles -->
+      <g opacity="0.5">
+        <circle r="2" fill="#00d2ff">
+          <animateMotion dur="4s" repeatCount="indefinite" path="M170,70 L350,140"/>
+        </circle>
+        <circle r="2" fill="#6c5ce7">
+          <animateMotion dur="5s" repeatCount="indefinite" path="M530,70 L350,140"/>
+        </circle>
+        <circle r="1.5" fill="#00e676">
+          <animateMotion dur="3.5s" repeatCount="indefinite" path="M350,40 L350,140"/>
+        </circle>
+      </g>
+      <!-- Labels -->
+      <g font-family="monospace" font-size="9" opacity="0.3" fill="#fff">
+        <text x="155" y="58">Research</text>
+        <text x="515" y="58">Compliance</text>
+        <text x="155" y="228">Risk</text>
+        <text x="515" y="228">Sourcing</text>
+        <text x="336" y="30">Decisions</text>
+      </g>
+    </svg>
+  </div>
+  <div class="btns">
+    <a href="#contact" class="btn btn-primary" data-en="Get Early Access" data-es="Acceso Anticipado" data-fr="Accès Anticipé">Get Early Access</a>
+    <a href="#product" class="btn btn-outline" data-en="See How It Works" data-es="Cómo Funciona" data-fr="Voir Comment Ça Marche">See How It Works</a>
+  </div>
+</section>
+
+<!-- Problem / Solution -->
+<section class="problem" id="product">
+  <h2 class="reveal" data-en="The old way vs. The Arca way" data-es="El método antiguo vs. El método Arca" data-fr="L'ancienne méthode vs. La méthode Arca">The old way vs. The Arca way</h2>
+  <div class="split">
+    <div class="box bad reveal">
+      <h3 style="color:var(--red)" data-en="❌ Without Arca" data-es="❌ Sin Arca" data-fr="❌ Sans Arca">❌ Without Arca</h3>
+      <ul>
+        <li data-en="Analysts spend 60% of time gathering data, not analyzing it" data-es="Los analistas pasan el 60% del tiempo recopilando datos, no analizándolos" data-fr="Les analystes passent 60% du temps à collecter des données, pas à les analyser">Analysts spend 60% of time gathering data, not analyzing it</li>
+        <li data-en="Compliance reviews take days across email chains" data-es="Las revisiones de compliance tardan días entre cadenas de emails" data-fr="Les revues de conformité prennent des jours via des chaînes d'emails">Compliance reviews take days across email chains</li>
+        <li data-en="Deal memos are 40-page PDFs no one reads in full" data-es="Los deal memos son PDFs de 40 páginas que nadie lee completos" data-fr="Les mémos de deal sont des PDF de 40 pages que personne ne lit en entier">Deal memos are 40-page PDFs no one reads in full</li>
+        <li data-en="Stress tests run quarterly because they take a week to set up" data-es="Los stress tests se ejecutan trimestralmente porque tardan una semana en configurarse" data-fr="Les stress tests sont trimestriels car ils prennent une semaine à configurer">Stress tests run quarterly because they take a week to set up</li>
+        <li data-en="Institutional knowledge lives in email threads and retirements" data-es="El conocimiento institucional vive en hilos de email y jubilaciones" data-fr="La connaissance institutionnelle vit dans des fils d'emails et des départs à la retraite">Institutional knowledge lives in email threads and retirements</li>
+      </ul>
+    </div>
+    <div class="box good reveal">
+      <h3 style="color:var(--green)" data-en="✓ With Arca" data-es="✓ Con Arca" data-fr="✓ Avec Arca">✓ With Arca</h3>
+      <ul>
+        <li data-en="AI ingests and synthesizes research in minutes, not days" data-es="La IA ingiere y sintetiza investigación en minutos, no días" data-fr="L'IA ingère et synthétise la recherche en minutes, pas en jours">AI ingests and synthesizes research in minutes, not days</li>
+        <li data-en="Compliance checks run automatically against every deal" data-es="Los controles de compliance se ejecutan automáticamente en cada deal" data-fr="Les contrôles de conformité s'exécutent automatiquement sur chaque deal">Compliance checks run automatically against every deal</li>
+        <li data-en="Smart factsheets generated from raw data — always up to date" data-es="Factsheets inteligentes generadas desde datos brutos — siempre actualizadas" data-fr="Des factsheets intelligentes générées à partir de données brutes — toujours à jour">Smart factsheets generated from raw data — always up to date</li>
+        <li data-en="Stress tests run on demand, any scenario, in seconds" data-es="Stress tests bajo demanda, cualquier escenario, en segundos" data-fr="Stress tests à la demande, n'importe quel scénario, en secondes">Stress tests run on demand, any scenario, in seconds</li>
+        <li data-en="Your AI copilot remembers every decision, every rationale, forever" data-es="Tu copiloto IA recuerda cada decisión, cada razonamiento, para siempre" data-fr="Votre copilote IA se souvient de chaque décision, chaque raisonnement, pour toujours">Your AI copilot remembers every decision, every rationale, forever</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="features" id="features">
+  <h2 class="reveal" data-en="Built for investment professionals" data-es="Diseñado para profesionales de inversión" data-fr="Conçu pour les professionnels de l'investissement">Built for investment professionals</h2>
+  <div class="feature-grid">
+    <div class="feature-card reveal">
+      <span class="feature-icon">🔍</span>
+      <h3 data-en="AI Research Chat" data-es="Chat de Investigación IA" data-fr="Chat de Recherche IA">AI Research Chat</h3>
+      <p data-en="Conversational AI trained on financial data. Ask anything, get sourced, cited answers — not hallucinations." data-es="IA conversacional entrenada con datos financieros. Pregunta lo que quieras, obtén respuestas con fuentes y citas — no alucinaciones." data-fr="IA conversationnelle entraînée sur des données financières. Posez n'importe quelle question, obtenez des réponses sourcées et citées — pas d'hallucinations.">Conversational AI trained on financial data. Ask anything, get sourced, cited answers — not hallucinations.</p>
+    </div>
+    <div class="feature-card reveal">
+      <span class="feature-icon">🛡️</span>
+      <h3 data-en="Compliance Automation" data-es="Automatización de Compliance" data-fr="Automatisation de la Conformité">Compliance Automation</h3>
+      <p data-en="Rules engine checks every deal, every document, every communication against your compliance framework." data-es="Motor de reglas que verifica cada deal, cada documento, cada comunicación contra tu marco de compliance." data-fr="Un moteur de règles vérifie chaque deal, chaque document, chaque communication par rapport à votre cadre de conformité.">Rules engine checks every deal, every document, every communication against your compliance framework.</p>
+    </div>
+    <div class="feature-card reveal">
+      <span class="feature-icon">🎯</span>
+      <h3 data-en="Deal Sourcing" data-es="Deal Sourcing" data-fr="Sourcing de Deals">Deal Sourcing</h3>
+      <p data-en="AI scans markets, news, and alternative data to surface opportunities matching your investment thesis." data-es="La IA escanea mercados, noticias y datos alternativos para detectar oportunidades alineadas con tu tesis de inversión." data-fr="L'IA scanne les marchés, les actualités et les données alternatives pour détecter des opportunités correspondant à votre thèse d'investissement.">AI scans markets, news, and alternative data to surface opportunities matching your investment thesis.</p>
+    </div>
+    <div class="feature-card reveal">
+      <span class="feature-icon">📊</span>
+      <h3 data-en="Smart Factsheets" data-es="Factsheets Inteligentes" data-fr="Factsheets Intelligentes">Smart Factsheets</h3>
+      <p data-en="Auto-generated, always-current one-pagers for every position. No more outdated tear sheets." data-es="One-pagers autogenerados y siempre actualizados para cada posición. Se acabaron los tear sheets obsoletos." data-fr="One-pagers auto-générés et toujours actuels pour chaque position. Fini les tear sheets obsolètes.">Auto-generated, always-current one-pagers for every position. No more outdated tear sheets.</p>
+    </div>
+    <div class="feature-card reveal">
+      <span class="feature-icon">⚡</span>
+      <h3 data-en="Stress Testing" data-es="Stress Testing" data-fr="Stress Testing">Stress Testing</h3>
+      <p data-en="Run any scenario — rate shocks, liquidity crunches, geopolitical events — and see portfolio impact in seconds." data-es="Ejecuta cualquier escenario — shocks de tipos, crisis de liquidez, eventos geopolíticos — y ve el impacto en cartera en segundos." data-fr="Exécutez n'importe quel scénario — chocs de taux, crises de liquidité, événements géopolitiques — et visualisez l'impact sur le portefeuille en secondes.">Run any scenario — rate shocks, liquidity crunches, geopolitical events — and see portfolio impact in seconds.</p>
+    </div>
+    <div class="feature-card reveal">
+      <span class="feature-icon">🤖</span>
+      <h3 data-en="Investment Copilot" data-es="Copiloto de Inversión" data-fr="Copilote d'Investissement">Investment Copilot</h3>
+      <p data-en="Your AI partner that remembers every analysis, flags inconsistencies, and prepares you for investment committee." data-es="Tu socio IA que recuerda cada análisis, detecta inconsistencias y te prepara para el comité de inversión." data-fr="Votre partenaire IA qui se souvient de chaque analyse, détecte les incohérences et vous prépare pour le comité d'investissement.">Your AI partner that remembers every analysis, flags inconsistencies, and prepares you for investment committee.</p>
+    </div>
+  </div>
+</section>
+
+<!-- How it works -->
+<section class="steps">
+  <h2 class="reveal" data-en="From data to decision in four steps" data-es="Del dato a la decisión en cuatro pasos" data-fr="De la donnée à la décision en quatre étapes">From data to decision in four steps</h2>
+  <div class="step-timeline">
+    <div class="step reveal">
+      <div class="step-num">1</div>
+      <h4 data-en="Connect" data-es="Conectar" data-fr="Connecter">Connect</h4>
+      <p data-en="Link your data sources — Bloomberg, Refinitiv, internal sheets, research portals." data-es="Conecta tus fuentes de datos — Bloomberg, Refinitiv, hojas internas, portales de investigación." data-fr="Reliez vos sources de données — Bloomberg, Refinitiv, feuilles internes, portails de recherche.">Link your data sources — Bloomberg, Refinitiv, internal sheets, research portals.</p>
+    </div>
+    <div class="step reveal">
+      <div class="step-num">2</div>
+      <h4 data-en="Analyze" data-es="Analizar" data-fr="Analyser">Analyze</h4>
+      <p data-en="Arca AI ingests, cleans, and cross-references everything in your private knowledge base." data-es="Arca AI ingiere, limpia y cruza toda la información en tu base de conocimiento privada." data-fr="Arca AI ingère, nettoie et croise toutes les informations dans votre base de connaissances privée.">Arca AI ingests, cleans, and cross-references everything in your private knowledge base.</p>
+    </div>
+    <div class="step reveal">
+      <div class="step-num">3</div>
+      <h4 data-en="Act" data-es="Actuar" data-fr="Agir">Act</h4>
+      <p data-en="Ask questions, run scenarios, generate reports — all with natural language, all in real time." data-es="Haz preguntas, ejecuta escenarios, genera informes — todo en lenguaje natural, todo en tiempo real." data-fr="Posez des questions, exécutez des scénarios, générez des rapports — tout en langage naturel, tout en temps réel.">Ask questions, run scenarios, generate reports — all with natural language, all in real time.</p>
+    </div>
+    <div class="step reveal">
+      <div class="step-num">4</div>
+      <h4 data-en="Decide" data-es="Decidir" data-fr="Décider">Decide</h4>
+      <p data-en="Walk into every meeting with AI-verified analysis, not gut feeling and stale PDFs." data-es="Llega a cada reunión con análisis verificado por IA, no con intuición y PDFs caducados." data-fr="Arrivez à chaque réunion avec une analyse vérifiée par IA, pas avec de l'intuition et des PDF périmés.">Walk into every meeting with AI-verified analysis, not gut feeling and stale PDFs.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Stats -->
+<section class="stats">
+  <div class="stat-grid reveal">
+    <div><div class="stat-num">60%</div><div class="stat-label" data-en="less time on data gathering" data-es="menos tiempo recopilando datos" data-fr="moins de temps sur la collecte de données">less time on data gathering</div></div>
+    <div><div class="stat-num">3×</div><div class="stat-label" data-en="faster deal analysis" data-es="análisis de deals más rápido" data-fr="analyse de deals plus rapide">faster deal analysis</div></div>
+    <div><div class="stat-num">100%</div><div class="stat-label" data-en="compliance coverage" data-es="cobertura de compliance" data-fr="couverture de conformité">compliance coverage</div></div>
+    <div><div class="stat-num">&lt;2s</div><div class="stat-label" data-en="stress test execution" data-es="ejecución de stress test" data-fr="exécution de stress test">stress test execution</div></div>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section class="testimonials">
+  <h2 class="reveal" data-en="Trusted by investment teams" data-es="Utilizado por equipos de inversión" data-fr="Utilisé par des équipes d'investissement">Trusted by investment teams</h2>
+  <div class="testimonial-grid">
+    <div class="testimonial-card reveal">
+      <p data-en='"Arca cut our quarterly reporting cycle from two weeks to two hours. The AI doesn\'t hallucinate — every number is traceable to source."'
+         data-es='"Arca redujo nuestro ciclo de reporting trimestral de dos semanas a dos horas. La IA no alucina — cada número es trazable hasta su fuente."' data-fr='"Arca a réduit notre cycle de reporting trimestriel de deux semaines à deux heures. L\'IA n\'hallucine pas — chaque chiffre est traçable jusqu\'à sa source."'>"Arca cut our quarterly reporting cycle from two weeks to two hours. The AI doesn't hallucinate — every number is traceable to source."</p>
+      <div class="author">
+        <div class="avatar" style="background:#6c5ce7">MC</div>
+        <div><strong>Marco Conti</strong><span data-en="CIO, Geneva Family Office" data-es="CIO, Family Office de Ginebra" data-fr="CIO, Family Office de Genève">CIO, Geneva Family Office</span></div>
+      </div>
+    </div>
+    <div class="testimonial-card reveal">
+      <p data-en='"We run stress tests on every position now — not just quarterly. When rates moved 200bps in a week, Arca had our exposure mapped before the market opened."' data-es='"Ahora hacemos stress tests de cada posición — no solo trimestralmente. Cuando los tipos se movieron 200pb en una semana, Arca ya tenía nuestra exposición mapeada antes de que abriera el mercado."' data-fr='"Nous faisons maintenant des stress tests sur chaque position — pas seulement trimestriellement. Quand les taux ont bougé de 200pb en une semaine, Arca avait déjà cartographié notre exposition avant l'ouverture du marché."'>"We run stress tests on every position now — not just quarterly. When rates moved 200bps in a week, Arca had our exposure mapped before the market opened."</p>
+      <div class="author">
+        <div class="avatar" style="background:#00d2ff">SK</div>
+        <div><strong>Sarah Kessler</strong><span data-en="Head of Risk, Apex Capital" data-es="Responsable de Riesgos, Apex Capital" data-fr="Responsable des Risques, Apex Capital">Head of Risk, Apex Capital</span></div>
+      </div>
+    </div>
+    <div class="testimonial-card reveal">
+      <p data-en='"The compliance automation alone paid for itself in the first month. Our team went from firefighting to actually thinking about the business."' data-es='"Solo la automatización de compliance se pagó sola en el primer mes. Nuestro equipo pasó de apagar fuegos a pensar de verdad en el negocio."' data-fr='"L'automatisation de la conformité s'est rentabilisée dès le premier mois. Notre équipe est passée du mode pompier à une vraie réflexion sur le business."'>"The compliance automation alone paid for itself in the first month. Our team went from firefighting to actually thinking about the business."</p>
+      <div class="author">
+        <div class="avatar" style="background:#00e676">JP</div>
+        <div><strong>Jean-Pierre Moreau</strong><span data-en="COO, Banque Privée Genève" data-es="COO, Banque Privée Genève" data-fr="COO, Banque Privée Genève">COO, Banque Privée Genève</span></div>
+      </div>
+    </div>
+    <div class="testimonial-card reveal">
+      <p data-en='"The experience with Arca AI was excellent and we made a lot of money."'
+         data-es='"La experiencia con Arca AI fue excelente y ganamos muchísimo dinero."'>"La experiencia con Arca AI fue excelente y ganamos muchísimo dinero."</p>
+      <div class="author">
+        <div class="avatar" style="background:#f39c12">IP</div>
+        <div><strong>Isaac Pérez</strong><span data-en="CTO, JLL" data-es="CTO, JLL" data-fr="CTO, JLL">CTO, JLL</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Pricing -->
+<section class="pricing" id="pricing">
+  <h2 class="reveal" data-en="Transparent pricing for serious capital" data-es="Precios transparentes para capital serio" data-fr="Tarifs transparents pour le capital sérieux">Transparent pricing for serious capital</h2>
+  <div class="pricing-grid">
+    <div class="pricing-card reveal">
+      <h3>Starter</h3>
+      <p style="color:var(--muted);font-size:0.9rem" data-en="Single-family office" data-es="Family office individual" data-fr="Family office individuel">Single-family office</p>
+      <div class="price">€3,400<small data-en="/mo" data-es="/mes" data-fr="/mois">/mo</small></div>
+      <ul>
+        <li data-en="Up to 5 users" data-es="Hasta 5 usuarios" data-fr="Jusqu'à 5 utilisateurs">Up to 5 users</li>
+        <li data-en="AI Research Chat" data-es="Chat de Investigación IA" data-fr="Chat de Recherche IA">AI Research Chat</li>
+        <li data-en="Basic compliance checks" data-es="Controles básicos de compliance" data-fr="Contrôles de conformité de base">Basic compliance checks</li>
+        <li data-en="5 data source connections" data-es="5 conexiones a fuentes de datos" data-fr="5 connexions de sources de données">5 data source connections</li>
+        <li data-en="Email support" data-es="Soporte por email" data-fr="Support par email">Email support</li>
+      </ul>
+      <a href="#contact" class="btn btn-outline" style="width:100%" data-en="Start Trial" data-es="Probar Gratis" data-fr="Essai Gratuit">Start Trial</a>
+    </div>
+    <div class="pricing-card featured reveal">
+      <h3>Professional</h3>
+      <p style="color:var(--muted);font-size:0.9rem" data-en="Multi-family office / Hedge fund" data-es="Multi-family office / Hedge fund" data-fr="Multi-family office / Hedge fund">Multi-family office / Hedge fund</p>
+      <div class="price">€9,999<small data-en="/mo" data-es="/mes" data-fr="/mois">/mo</small></div>
+      <ul>
+        <li data-en="Unlimited users" data-es="Usuarios ilimitados" data-fr="Utilisateurs illimités">Unlimited users</li>
+        <li data-en="Everything in Starter" data-es="Todo lo de Starter" data-fr="Tout ce qui est dans Starter">Everything in Starter</li>
+        <li data-en="Advanced compliance engine" data-es="Motor avanzado de compliance" data-fr="Moteur de conformité avancé">Advanced compliance engine</li>
+        <li data-en="Deal sourcing module" data-es="Módulo de deal sourcing" data-fr="Module de sourcing de deals">Deal sourcing module</li>
+        <li data-en="Stress testing & scenarios" data-es="Stress testing y escenarios" data-fr="Stress testing et scénarios">Stress testing & scenarios</li>
+        <li data-en="Custom integrations" data-es="Integraciones personalizadas" data-fr="Intégrations personnalisées">Custom integrations</li>
+        <li data-en="Priority support" data-es="Soporte prioritario" data-fr="Support prioritaire">Priority support</li>
+      </ul>
+      <a href="#contact" class="btn btn-primary" style="width:100%" data-en="Start Trial" data-es="Probar Gratis" data-fr="Essai Gratuit">Start Trial</a>
+    </div>
+    <div class="pricing-card reveal">
+      <h3>Enterprise</h3>
+      <p style="color:var(--muted);font-size:0.9rem" data-en="Private bank / Institution" data-es="Banca privada / Institución" data-fr="Banque privée / Institution">Private bank / Institution</p>
+      <div class="price" data-en="Custom" data-es="Personalizado" data-fr="Sur mesure">Custom</div>
+      <ul>
+        <li data-en="Everything in Professional" data-es="Todo lo de Professional" data-fr="Tout ce qui est dans Professional">Everything in Professional</li>
+        <li data-en="Dedicated tenant (single-tenant)" data-es="Tenant dedicado (single-tenant)" data-fr="Tenant dédié (single-tenant)">Dedicated tenant (single-tenant)</li>
+        <li data-en="On-premise deployment option" data-es="Opción de despliegue on-premise" data-fr="Option de déploiement on-premise">On-premise deployment option</li>
+        <li data-en="Custom AI model training" data-es="Entrenamiento de modelos IA personalizado" data-fr="Entraînement de modèles IA personnalisé">Custom AI model training</li>
+        <li data-en="ISO 27001 / DORA compliant" data-es="Certificado ISO 27001 / DORA" data-fr="Conforme ISO 27001 / DORA">ISO 27001 / DORA compliant</li>
+        <li data-en="24/7 dedicated support" data-es="Soporte dedicado 24/7" data-fr="Support dédié 24/7">24/7 dedicated support</li>
+      </ul>
+      <a href="#contact" class="btn btn-outline" style="width:100%" data-en="Contact Us" data-es="Contactar" data-fr="Nous Contacter">Contact Us</a>
+    </div>
+  </div>
+</section>
+
+<!-- Contact -->
+<section class="contact" id="contact">
+  <h2 class="reveal" data-en="Ready to see it in action?" data-es="¿Listo para verlo en acción?" data-fr="Prêt à le voir en action ?">Ready to see it in action?</h2>
+  <p class="reveal" data-en="No slide deck. No sales pitch. We'll show you Arca working on your own data." data-es="Sin presentaciones. Sin discurso comercial. Te mostramos Arca funcionando con tus propios datos." data-fr="Pas de présentation. Pas de discours commercial. Nous vous montrons Arca fonctionnant avec vos propres données.">No slide deck. No sales pitch. We'll show you Arca working on your own data.</p>
+  <form class="contact-form reveal" onsubmit="event.preventDefault(); alert(LANG==='es'?'Solicitud enviada. Te contactaremos en 24 horas.':'Demo request sent. We\'ll reach out within 24 hours.');">
+    <input type="text" data-en-placeholder="Full name" data-es-placeholder="Nombre completo" data-fr-placeholder="Nom complet" placeholder="Full name" required>
+    <input type="email" data-en-placeholder="Work email" data-es-placeholder="Email profesional" data-fr-placeholder="Email professionnel" placeholder="Work email" required>
+    <input type="text" data-en-placeholder="Company" data-es-placeholder="Empresa" data-fr-placeholder="Entreprise" placeholder="Company">
+    <textarea rows="4" data-en-placeholder="What would you like to see in the demo?" data-es-placeholder="¿Qué te gustaría ver en la demo?" data-fr-placeholder="Que souhaitez-vous voir dans la démo ?" placeholder="What would you like to see in the demo?"></textarea>
+    <button type="submit" class="btn btn-primary" style="width:100%;padding:0.9rem;" data-en="Request Demo" data-es="Solicitar Demo" data-fr="Demander une Démo">Request Demo</button>
+  </form>
+  <div class="reveal" style="margin-top:2rem; padding:1.5rem; background:var(--card); border:1px solid var(--border); border-radius:var(--radius); text-align:center;">
+    <p style="margin-bottom:0.75rem; font-weight:600;" data-en="Or contact us directly:" data-es="O contacta directamente:" data-fr="Ou contactez-nous directement :">Or contact us directly:</p>
+    <p style="margin:0.25rem 0; color:var(--muted);">📧 <a href="mailto:isaacpe@gmail.com" style="color:var(--accent);">isaacpe@gmail.com</a></p>
+    <p style="margin:0.25rem 0; color:var(--muted);">📞 <a href="tel:+34609010257" style="color:var(--accent);">+34 609 01 02 57</a></p>
+  </div>
+</section>
+
+<footer class="reveal">
+  <p><span data-en="© 2026 Arca AI. Built for the investors who move capital." data-es="© 2026 Arca AI. Creado para los inversores que mueven capital." data-fr="© 2026 Arca AI. Créé pour les investisseurs qui font bouger le capital.">© 2026 Arca AI. Built for the investors who move capital.</span> <a href="#">Privacy</a> · <a href="#">Terms</a> · <a href="#">Security</a></p>
+  <p style="margin-top:0.5rem" data-en="ISO 27001 certified · SOC 2 Type II · DORA compliant" data-es="Certificado ISO 27001 · SOC 2 Tipo II · Cumplimiento DORA" data-fr="Certifié ISO 27001 · SOC 2 Type II · Conforme DORA">ISO 27001 certified · SOC 2 Type II · DORA compliant</p>
+</footer>
+
+<script>
+  var LANG = localStorage.getItem('lang') || 'en';
+
+  function setLang(lang) {
+    LANG = lang;
+    localStorage.setItem('lang', lang);
+    document.documentElement.lang = lang;
+    document.getElementById('btn-en').classList.toggle('active', lang==='en');
+    document.getElementById('btn-es').classList.toggle('active', lang==='es');
+    document.getElementById('btn-fr').classList.toggle('active', lang==='fr');
+
+    // Text content via data-en/data-es/data-fr
+    document.querySelectorAll('[data-en][data-es]').forEach(el => {
+      var attr = 'data-' + lang;
+      if (el.tagName === 'H1' && el.getAttribute(attr)) {
+        el.innerHTML = el.getAttribute(attr);
+      } else {
+        el.textContent = el.getAttribute(attr);
+      }
+    });
+
+    // Placeholders for inputs
+    document.querySelectorAll('[data-en-placeholder][data-es-placeholder]').forEach(el => {
+      var attr = 'data-' + lang + '-placeholder';
+      if (el.hasAttribute(attr)) el.placeholder = el.getAttribute(attr);
+    });
+  }
+
+  document.getElementById('btn-en').addEventListener('click', function(){ setLang('en'); });
+  document.getElementById('btn-es').addEventListener('click', function(){ setLang('es'); });
+  document.getElementById('btn-fr').addEventListener('click', function(){ setLang('fr'); });
+
+  // Init language on load
+  setLang(LANG);
+
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
