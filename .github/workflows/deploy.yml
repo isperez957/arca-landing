@@ -1,0 +1,36 @@
+name: Deploy to S3 + Invalidate CloudFront
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  id-token: write   # Required for OIDC
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::649091762015:role/github-actions-oidc
+          aws-region: eu-west-1
+
+      - name: Sync to S3
+        run: |
+          aws s3 sync . s3://arca-landing-649091762015 \
+            --delete \
+            --exclude ".git/*" \
+            --exclude ".github/*" \
+            --exclude "README.md" \
+            --cache-control "max-age=3600"
+
+      - name: Invalidate CloudFront
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ES3RSFQ2A0Q1O \
+            --paths "/*"
