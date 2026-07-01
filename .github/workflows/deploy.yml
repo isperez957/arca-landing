@@ -1,11 +1,11 @@
-name: Deploy to S3 + Invalidate CloudFront
+name: Deploy to S3 + Lambda + Invalidate CloudFront
 
 on:
   push:
     branches: [main]
 
 permissions:
-  id-token: write   # Required for OIDC
+  id-token: write
   contents: read
 
 jobs:
@@ -20,6 +20,24 @@ jobs:
           role-to-assume: arn:aws:iam::649091762015:role/github-actions-oidc
           aws-region: eu-west-1
 
+      - name: Deploy Lambda
+        run: |
+          cd lambda
+          zip -r ../lambda.zip .
+          cd ..
+          aws lambda update-function-code \
+            --function-name arca-submit-contact \
+            --zip-file fileb://lambda.zip
+          rm lambda.zip
+
+      - name: Get Lambda URL and inject into index.html
+        run: |
+          URL=$(aws lambda get-function-url-config \
+            --function-name arca-submit-contact \
+            --query FunctionUrl --output text)
+          echo "Lambda URL: $URL"
+          sed -i "s|LAMBDA_CONTACT_URL_PLACEHOLDER|$URL|g" index.html
+
       - name: Sync to S3
         run: |
           aws s3 sync . s3://arca-landing-649091762015 \
@@ -27,6 +45,8 @@ jobs:
             --exclude ".git/*" \
             --exclude ".github/*" \
             --exclude "README.md" \
+            --exclude "lambda/*" \
+            --exclude "lambda.zip" \
             --cache-control "max-age=3600"
 
       - name: Invalidate CloudFront
