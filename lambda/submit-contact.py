@@ -12,7 +12,6 @@ import boto3
 
 S3_BUCKET = os.environ["CONTACTS_BUCKET"]
 S3_KEY = "contacts.csv"
-ALLOWED_ORIGIN = os.environ.get("ALLOWED_ORIGIN", "*")
 
 s3 = boto3.client("s3")
 
@@ -46,22 +45,11 @@ def _save_csv(rows: list[list[str]]) -> None:
 
 
 def handler(event: dict, context) -> dict:
-    headers = {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
-    }
+    headers = {"Content-Type": "application/json"}
 
     # ── CORS preflight ──────────────────────────────────────────
     if event.get("requestContext", {}).get("http", {}).get("method") == "OPTIONS":
-        return {
-            "statusCode": 200,
-            "headers": {
-                **headers,
-                "Access-Control-Allow-Methods": "POST, OPTIONS",
-                "Access-Control-Allow-Headers": "Content-Type",
-            },
-            "body": "",
-        }
+        return {"statusCode": 200, "headers": headers, "body": ""}
 
     # ── Parse body ──────────────────────────────────────────────
     try:
