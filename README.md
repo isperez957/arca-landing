@@ -52,9 +52,23 @@ arca-browser file://$(pwd)/index.html
 
 ```
 arca-landing/
-├── index.html    # Everything — HTML, CSS, JS, SVG inline
+├── index.html       # Everything — HTML, CSS, JS, SVG inline
+├── lambda/          # Contact form handler (Python)
+│   └── submit-contact.py
+├── .github/
+│   └── workflows/   # CI/CD: S3 sync + CloudFront invalidation
 └── README.md
 ```
+
+## Infrastructure
+
+IaC managed in the consolidated [terraform](https://github.com/isperez957/terraform) repo (`landing-web/` folder).
+
+| Resource | Detail |
+|---|---|
+| S3 | `arca-landing-649091762015` (static hosting) |
+| CloudFront | `ES3RSFQ2A0Q1O` (CDN, PriceClass_100) |
+| Lambda | `arca-submit-contact` (Python 3.12, Function URL) |
 
 ## Contact
 
